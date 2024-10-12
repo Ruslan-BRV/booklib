@@ -1,17 +1,21 @@
 from books.models import Book, Genre, Author
 from rest_framework import serializers
 
-class BookSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Book
-        fields = ['name', 'image', 'authors', 'genre', 'quantity']
 
-class GenreSerializer(serializers.HyperlinkedModelSerializer):
+
+class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = ['name',]
+        fields = ['name']
 
-class AuthorSerializer(serializers.HyperlinkedModelSerializer):
+class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
-        fields = ['name',]
+        fields = ['name']
+
+class BookSerializer(serializers.ModelSerializer):
+    authors = AuthorSerializer(many=True)
+
+    class Meta:
+        model = Book
+        fields = ['id', 'name', 'image', 'authors', 'genre', 'quantity']
