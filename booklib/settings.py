@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': 'booklib_db',
         'USER': 'postgres',
         'PASSWORD': '130283BVA',
-        'HOST': 'localhost', 
+        'HOST': 'db', 
         'PORT': 5432
     }
 }
