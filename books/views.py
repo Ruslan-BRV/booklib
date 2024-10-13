@@ -1,10 +1,15 @@
+from functools import lru_cache
 from books.models import Author, Book, Genre
-from rest_framework import viewsets
+from rest_framework import viewsets, serializers, status
 from rest_framework.pagination import PageNumberPagination
 from books.serializers import AuthorSerializer, BookSerializer, GenreSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.views import APIView
 from django.db import models
+from django.utils.decorators import method_decorator
+from drf_yasg.utils import swagger_auto_schema
+from books.docs.book import BOOK_DOCS
 
 
 # Класс пагинации с возможностью получения размера страницы через GET параметры
@@ -18,7 +23,10 @@ class Pagination(PageNumberPagination):
         return self.page_size
 
 
-# ViewSet для модели Book
+@method_decorator(
+    name='list',
+    decorator=swagger_auto_schema(**BOOK_DOCS)
+)
 class BookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     queryset = Book.objects.all().order_by('id')
@@ -80,25 +88,67 @@ class GenreViewSet(viewsets.ModelViewSet):
     pagination_class = Pagination
 
 
-# Закомментированный пример класса для массовой доставки книг
-# class BookDeliveryView(APIView):
-#     def post(self, request):
-#         books_data = request.data  # Ожидается массив объектов книг
-#         for book_data in books_data:
-#             title = book_data['title']
-#             authors_data = book_data['authors']
-#             count = book_data['count']
-#
-#             # Найдите или создайте авторов
-#             authors = []
-#             for author_data in authors_data:
-#                 author, created = Author.objects.get_or_create(name=author_data['title'])
-#                 authors.append(author)
-#
-#             # Найдите или создайте книгу
-#             book, created = Book.objects.get_or_create(title=title)
-#             book.quantity += count  # Увеличьте количество экземпляров
-#             book.save()
-#             book.authors.set(authors)  # Обновите связь с авторами
-#
-#         return Response(status=status.HTTP_201_CREATED)
+class BookDeliveryView(APIView):
+    def post(self, request):
+        """
+        Обрабатывает запрос на добавление или обновление книг.
+        Если книга уже существует — увеличивает количество.
+        Если книга повторяется в текущем запросе — обновляет её.
+        Иначе — создаёт новую запись.
+        """
+        updated_books = []
+        created_books = []
+        for book in request.data:
+            if not book['title']:
+                 raise serializers.ValidationError("Название книги не может быть пустым.")
+            title = book['title']
+            count = book['count']
+            #Ищем книгу в базе данных
+            book_db = self._books.get(title)
+            # Ищем книгу, которая была создана в текущем запросе, но повторяется еще раз
+            created_book = list(filter(
+                lambda x: x.title == title,
+                created_books
+            ))
+            if book_db:
+                 # Если книга существует, увеличиваем количество экземпляров
+                book_db.count += count
+                updated_books.append(book_db)
+            elif created_book:
+                # Если книга была создана в текущем запросе, обновляем количество
+                created_book[0].count += count
+                updated_books.append(created_book[0])
+            else:
+                if not book.get('authors'):
+                    raise serializers.ValidationError("Поле авторы не может быть пустым.")
+                authors_data = book['authors']
+                # Добавляем либо создаем авторов
+                authors = [
+                    Author.objects.get_or_create(title=author_data['title'])[0]
+                    for author_data in authors_data
+                ]
+                # Создаем новую книгу и добавляем её в базу
+                book_db = Book.objects.create(
+                    title=title,
+                    count=count
+                )
+                book_db.authors.set(authors)
+                if book.get('genre'):
+                    if not book['genre'].get('title'):
+                        raise serializers.ValidationError('Поле title жанра обязательно.')
+                    book_db.genre = Genre.objects.get_or_create(title=book['genre']['title'])[0]
+                    book_db.save()
+                created_books.append(book_db)
+        Book.objects.bulk_update(updated_books, ['count'])
+        return Response(
+            BookSerializer(Book.objects.all(), many=True).data,
+            status=status.HTTP_201_CREATED
+        )
+
+    @property
+    @lru_cache
+    def _books(self):
+        return {
+            book.title: book
+            for book in Book.objects.all()
+        }     
