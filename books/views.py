@@ -29,7 +29,7 @@ class BookViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         title = self.request.query_params.get('title', None)
         if title is not None:
-            queryset = queryset.filter(name__icontains=title)
+            queryset = queryset.filter(title__icontains=title)
         return queryset
 
     # Метод для получения списка топ-N книг
@@ -56,7 +56,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
     def stat(self, request, pk=None):
         author = self.get_object()
         book_count = author.books.count()
-        return Response({'author': author.name, 'book_count': book_count})
+        return Response({'author': author.title, 'book_count': book_count})
 
     # Метод для получения статистики по всем авторам с возможностью пагинации, сортировка по количеству книг
     @action(detail=False, methods=['get'])
