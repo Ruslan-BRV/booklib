@@ -37,7 +37,7 @@ class BookViewSet(viewsets.ModelViewSet):
         top_n = request.query_params.get('top', None)
         if top_n is not None:
             top_n = int(top_n)
-            books = Book.objects.order_by('-quantity')[:top_n]
+            books = Book.objects.order_by('-count')[:top_n]
         else:
             books = Book.objects.all()
 
