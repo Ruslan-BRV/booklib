@@ -28,10 +28,10 @@ class Author(models.Model):
     
 class Book(models.Model):
     name = models.CharField(max_length=255, db_column='Name', unique=True)
-    image = models.ImageField(verbose_name="Изображение", upload_to="imageBooks/", null=True)
+    image = models.ImageField(verbose_name="Изображение", upload_to="imageBooks/", null=False, blank=True, default='default.jpg')
     authors = models.ManyToManyField('Author', related_name='books', verbose_name='Авторы')
     genre = models.ForeignKey(Genre, verbose_name="жанр", on_delete=models.CASCADE, related_name="genre", null=True) 
-    quantity = models.IntegerField(verbose_name="Количество", blank=True)
+    quantity = models.IntegerField(verbose_name="Количество", default=0)
 
     class Meta:
         db_table = 'Books'
