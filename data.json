@@ -1,0 +1,77 @@
+[
+    {
+        "model": "books.genre",
+        "pk": 1,
+        "fields": {
+            "title": "Фантастика"
+        }
+    },
+    {
+        "model": "books.genre",
+        "pk": 2,
+        "fields": {
+            "title": "Детектив"
+        }
+    },
+    {
+        "model": "books.genre",
+        "pk": 3,
+        "fields": {
+            "title": "Роман"
+        }
+    },
+    {
+        "model": "books.author",
+        "pk": 1,
+        "fields": {
+            "title": "Лев Толстой"
+        }
+    },
+    {
+        "model": "books.author",
+        "pk": 2,
+        "fields": {
+            "title": "Федор Достоевский"
+        }
+    },
+    {
+        "model": "books.author",
+        "pk": 3,
+        "fields": {
+            "title": "Александр Пушкин"
+        }
+    },
+    {
+        "model": "books.book",
+        "pk": 1,
+        "fields": {
+            "title": "Война и мир",
+            "image": "imageBooks/default.jpg",
+            "count": 5,
+            "genre": 1,
+            "authors": [1, 2]
+        }
+    },
+    {
+        "model": "books.book",
+        "pk": 2,
+        "fields": {
+            "title": "Преступление и наказание",
+            "image": "imageBooks/default.jpg",
+            "count": 3,
+            "genre": 2,
+            "authors": [2]
+        }
+    },
+    {
+        "model": "books.book",
+        "pk": 3,
+        "fields": {
+            "title": "Евгений Онегин",
+            "image": "imageBooks/default.jpg",
+            "count": 4,
+            "genre": 3,
+            "authors": [3]
+        }
+    }
+]
