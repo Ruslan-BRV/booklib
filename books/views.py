@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from django.db import models
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
-from books.docs.book import BOOK_DOCS
+from books.docs.book import BOOK_DOCS, BOOK_TOP_DOCS, BOOK_DELIVERY_DOCS
 
 
 # Класс пагинации с возможностью получения размера страницы через GET параметры
@@ -22,9 +22,8 @@ class Pagination(PageNumberPagination):
             return int(page_size)
         return self.page_size
 
-
 @method_decorator(
-    name='list',
+    name='list', 
     decorator=swagger_auto_schema(**BOOK_DOCS)
 )
 class BookViewSet(viewsets.ModelViewSet):
@@ -41,6 +40,7 @@ class BookViewSet(viewsets.ModelViewSet):
         return queryset
 
     # Метод для получения списка топ-N книг
+    @swagger_auto_schema(**BOOK_TOP_DOCS)
     def list_top_books(self, request):
         top_n = request.query_params.get('top', None)
         if top_n is not None:
@@ -53,7 +53,7 @@ class BookViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-# ViewSet для модели Author
+
 class AuthorViewSet(viewsets.ModelViewSet):
     serializer_class = AuthorSerializer
     queryset = Author.objects.all().order_by('id')
@@ -81,7 +81,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-# ViewSet для модели Genre
+
 class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     queryset = Genre.objects.all().order_by('id')
@@ -89,6 +89,7 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 
 class BookDeliveryView(APIView):
+    @swagger_auto_schema(**BOOK_DELIVERY_DOCS)
     def post(self, request):
         """
         Обрабатывает запрос на добавление или обновление книг.
