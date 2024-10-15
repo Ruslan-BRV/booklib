@@ -28,7 +28,7 @@ class Pagination(PageNumberPagination):
 )
 class BookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
-    queryset = Book.objects.all().order_by('id')
+    queryset = Book.objects.all().select_related('genre').prefetch_related('authors').order_by('id')
     pagination_class = Pagination
 
     # Переопределение метода get_queryset для фильтрации книг по названию
@@ -56,7 +56,7 @@ class BookViewSet(viewsets.ModelViewSet):
 
 class AuthorViewSet(viewsets.ModelViewSet):
     serializer_class = AuthorSerializer
-    queryset = Author.objects.all().order_by('id')
+    queryset = Author.objects.all().prefetch_related('books').order_by('id')
     pagination_class = Pagination
 
     # Метод для получения количества книг автора

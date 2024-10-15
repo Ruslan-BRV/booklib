@@ -21,6 +21,20 @@
         }
     },
     {
+        "model": "books.genre",
+        "pk": 4,
+        "fields": {
+            "title": "Исторический"
+        }
+    },
+    {
+        "model": "books.genre",
+        "pk": 5,
+        "fields": {
+            "title": "Фэнтези"
+        }
+    },
+    {
         "model": "books.author",
         "pk": 1,
         "fields": {
@@ -39,6 +53,20 @@
         "pk": 3,
         "fields": {
             "title": "Александр Пушкин"
+        }
+    },
+    {
+        "model": "books.author",
+        "pk": 4,
+        "fields": {
+            "title": "Артур Конан Дойл"
+        }
+    },
+    {
+        "model": "books.author",
+        "pk": 5,
+        "fields": {
+            "title": "Жюль Верн"
         }
     },
     {
@@ -71,6 +99,72 @@
             "image": "imageBooks/default.jpg",
             "count": 4,
             "genre": 3,
+            "authors": [3]
+        }
+    },
+    {
+        "model": "books.book",
+        "pk": 4,
+        "fields": {
+            "title": "Шерлок Холмс: Собака Баскервилей",
+            "image": "imageBooks/default.jpg",
+            "count": 6,
+            "genre": 2,
+            "authors": [4]
+        }
+    },
+    {
+        "model": "books.book",
+        "pk": 5,
+        "fields": {
+            "title": "20 000 лье под водой",
+            "image": "imageBooks/default.jpg",
+            "count": 8,
+            "genre": 5,
+            "authors": [5]
+        }
+    },
+    {
+        "model": "books.book",
+        "pk": 6,
+        "fields": {
+            "title": "Анна Каренина",
+            "image": "imageBooks/default.jpg",
+            "count": 2,
+            "genre": 3,
+            "authors": [1]
+        }
+    },
+    {
+        "model": "books.book",
+        "pk": 7,
+        "fields": {
+            "title": "Братья Карамазовы",
+            "image": "imageBooks/default.jpg",
+            "count": 5,
+            "genre": 3,
+            "authors": [2]
+        }
+    },
+    {
+        "model": "books.book",
+        "pk": 8,
+        "fields": {
+            "title": "Таинственный остров",
+            "image": "imageBooks/default.jpg",
+            "count": 7,
+            "genre": 5,
+            "authors": [5]
+        }
+    },
+    {
+        "model": "books.book",
+        "pk": 9,
+        "fields": {
+            "title": "Капитанская дочка",
+            "image": "imageBooks/default.jpg",
+            "count": 4,
+            "genre": 4,
             "authors": [3]
         }
     }
