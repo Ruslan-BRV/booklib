@@ -20,28 +20,15 @@
    ```bash
    cd booklib
 
-3. Создайте виртуальное окружение:
-    ```bash
-    py -m venv myenv
+3. Измените названия файла `.env.example` на `.env`
 
-4. Активируйте виртуальное окружение:
-- Windows: 
-    ```bash
-    myenv\Scripts\activate
+4. В файле `.env` введите свои настройки
 
-- macOS и Linux: 
-    ```bash
-    source myenv/bin/activate
-
-5. Измените названия файла `.env.example` на `.env`
-
-6. В файле `.env` введите свои настройки
-
-7. В консоле введите:
+5. В консоле введите:
     ```bash
     docker-compose up
 
-8. Страница документации: http://127.0.0.1:8000/swagger/
+6. Страница документации: http://127.0.0.1:8000/swagger/
 
 ## Эндпоинты
 
