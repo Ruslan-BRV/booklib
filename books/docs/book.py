@@ -1,8 +1,8 @@
-from books.models import Book
-from books.serializers import AuthorSerializer, BookSerializer, GenreSerializer
 from drf_yasg import openapi
+
 from rest_framework import status
 
+from books.serializers import AuthorSerializer, BookSerializer, GenreSerializer
 
 
 BOOK_DOCS = {

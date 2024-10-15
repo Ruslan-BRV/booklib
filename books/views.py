@@ -1,19 +1,23 @@
 from functools import lru_cache
-from books.models import Author, Book, Genre
+
+from django.db import models
+from django.utils.decorators import method_decorator
+
 from rest_framework import viewsets, serializers, status
 from rest_framework.pagination import PageNumberPagination
-from books.serializers import AuthorSerializer, BookSerializer, GenreSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
-from django.db import models
-from django.utils.decorators import method_decorator
+
 from drf_yasg.utils import swagger_auto_schema
+
+from books.models import Author, Book, Genre
+from books.serializers import AuthorSerializer, BookSerializer, GenreSerializer
 from books.docs.book import BOOK_DOCS, BOOK_TOP_DOCS, BOOK_DELIVERY_DOCS
 
 
-# Класс пагинации с возможностью получения размера страницы через GET параметры
 class Pagination(PageNumberPagination):
+    """Класс пагинации с возможностью получения размера страницы через GET параметры"""
     page_size = 3
 
     def get_page_size(self, request):
@@ -22,26 +26,26 @@ class Pagination(PageNumberPagination):
             return int(page_size)
         return self.page_size
 
+
 @method_decorator(
-    name='list', 
-    decorator=swagger_auto_schema(**BOOK_DOCS)
+    name='list', decorator=swagger_auto_schema(**BOOK_DOCS)
 )
 class BookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     queryset = Book.objects.all().select_related('genre').prefetch_related('authors').order_by('id')
     pagination_class = Pagination
 
-    # Переопределение метода get_queryset для фильтрации книг по названию
     def get_queryset(self):
+        """Переопределение метода get_queryset для фильтрации книг по названию"""
         queryset = super().get_queryset()
         title = self.request.query_params.get('title', None)
         if title is not None:
             queryset = queryset.filter(title__icontains=title)
         return queryset
 
-    # Метод для получения списка топ-N книг
     @swagger_auto_schema(**BOOK_TOP_DOCS)
     def list_top_books(self, request):
+        """Метод для получения списка топ-N книг"""
         top_n = request.query_params.get('top', None)
         if top_n is not None:
             top_n = int(top_n)
@@ -53,22 +57,23 @@ class BookViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-
 class AuthorViewSet(viewsets.ModelViewSet):
     serializer_class = AuthorSerializer
     queryset = Author.objects.all().prefetch_related('books').order_by('id')
     pagination_class = Pagination
 
-    # Метод для получения количества книг автора
     @action(detail=True, methods=['get'])
     def stat(self, request, pk=None):
+        """Метод для получения количества книг автора"""
         author = self.get_object()
         book_count = author.books.count()
         return Response({'author': author.title, 'book_count': book_count})
 
-    # Метод для получения статистики по всем авторам с возможностью пагинации, сортировка по количеству книг
     @action(detail=False, methods=['get'])
     def stats(self, request):
+        """Метод для получения статистики по всем авторам с возможностью пагинации, 
+        сортировка по количеству книг
+        """
         authors = Author.objects.prefetch_related('books').annotate(
             book_count=models.Count('books')
         ).order_by('-book_count')
@@ -81,7 +86,6 @@ class AuthorViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-
 class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     queryset = Genre.objects.all().order_by('id')
@@ -91,8 +95,7 @@ class GenreViewSet(viewsets.ModelViewSet):
 class BookDeliveryView(APIView):
     @swagger_auto_schema(**BOOK_DELIVERY_DOCS)
     def post(self, request):
-        """
-        Обрабатывает запрос на добавление или обновление книг.
+        """Обрабатывает запрос на добавление или обновление книг.
         Если книга уже существует — увеличивает количество.
         Если книга повторяется в текущем запросе — обновляет её.
         Иначе — создаёт новую запись.
@@ -149,6 +152,11 @@ class BookDeliveryView(APIView):
     @property
     @lru_cache
     def _books(self):
+        """Возвращает словарь всех книг из базы данных с их названиями в качестве ключей.
+        Метод использует кэширование с помощью декоратора `lru_cache`, чтобы 
+        сохранить результат первого вызова и использовать его повторно 
+        для повышения производительности при последующих обращениях.
+        """
         return {
             book.title: book
             for book in Book.objects.all()
