@@ -15,17 +15,33 @@
 1. Клонируйте репозиторий:
    ```bash
    git clone https://github.com/Ruslan-BRV/booklib.git
+
+2. Перейдите в папку репозитория:
+   ```bash
    cd booklib
 
-2. Измените названия файла `.env.example` на `.env`
+3. Создайте виртуальное окружение:
+    ```bash
+    py -m venv myenv
 
-3. В файле `.env` введите свои настройки
+4. Активируйте виртуальное окружение:
+- Windows: 
+    ```bash
+    myenv\Scripts\activate
 
-4. В консоле введите:
+- macOS и Linux: 
+    ```bash
+    source myenv/bin/activate
+
+5. Измените названия файла `.env.example` на `.env`
+
+6. В файле `.env` введите свои настройки
+
+7. В консоле введите:
     ```bash
     docker-compose up
 
-5. Страница документации: http://127.0.0.1:8000/swagger/
+8. Страница документации: http://127.0.0.1:8000/swagger/
 
 ## Эндпоинты
 
